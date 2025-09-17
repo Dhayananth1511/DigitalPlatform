@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useP2P } from '../../contexts/P2PContext';
 import { BookOpen, Users, BarChart3, Mic, Trophy, Clock, Target, Star } from 'lucide-react';
 import Navigation from '../Navigation';
 
@@ -10,6 +11,7 @@ const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
   const { lessons, getStudentStats } = useData();
   const { t } = useLanguage();
+  const { connectedPeers, messages } = useP2P();
   
   const stats = getStudentStats();
   const recentLessons = lessons.slice(0, 3);
@@ -45,6 +47,8 @@ const StudentDashboard: React.FC = () => {
     },
   ];
 
+  // Get recent peer messages
+  const recentMessages = messages.slice(-3);
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -58,6 +62,16 @@ const StudentDashboard: React.FC = () => {
           <p className="text-gray-600">
             Ready to continue your learning journey today?
           </p>
+          
+          {/* P2P Status */}
+          {connectedPeers.length > 0 && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                🌐 Connected with {connectedPeers.length} peer{connectedPeers.length !== 1 ? 's' : ''}: {' '}
+                {connectedPeers.map(p => p.name).join(', ')}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Stats Cards */}
@@ -132,32 +146,71 @@ const StudentDashboard: React.FC = () => {
         </div>
 
         {/* Recent Lessons */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Continue Learning</h2>
-          <div className="space-y-4">
-            {recentLessons.map((lesson) => (
-              <Link
-                key={lesson.id}
-                to={`/student/lesson/${lesson.id}`}
-                className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{lesson.title}</h3>
-                    <p className="text-sm text-gray-600">{lesson.subject} • {lesson.duration} minutes</p>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Recent Lessons */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Continue Learning</h2>
+            <div className="space-y-4">
+              {recentLessons.map((lesson) => (
+                <Link
+                  key={lesson.id}
+                  to={`/student/lesson/${lesson.id}`}
+                  className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{lesson.title}</h3>
+                      <p className="text-sm text-gray-600">{lesson.subject} • {lesson.duration} minutes</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        lesson.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
+                        lesson.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {lesson.difficulty}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      lesson.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                      lesson.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {lesson.difficulty}
-                    </span>
-                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Peer Activity */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Peer Activity</h3>
+              {recentMessages.length > 0 ? (
+                <div className="space-y-3">
+                  {recentMessages.map((message) => (
+                    <div key={message.id} className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-gray-900">{message.senderName}</p>
+                      <p className="text-sm text-gray-600">{message.content}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  ))}
                 </div>
+              ) : (
+                <p className="text-gray-500 text-sm">No recent peer activity</p>
+              )}
+            </div>
+
+            {/* Quick AI Story */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-2">AI Storyteller</h3>
+              <p className="text-sm opacity-90 mb-4">
+                Create personalized stories with AI and share them with your peers!
+              </p>
+              <Link
+                to="/student/storyteller"
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all inline-block"
+              >
+                Start Creating
               </Link>
-            ))}
+            </div>
           </div>
         </div>
       </main>

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
+import { P2PProvider } from './contexts/P2PContext';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import StudentDashboard from './components/student/StudentDashboard';
@@ -15,6 +16,7 @@ import TeacherLessons from './components/teacher/TeacherLessons';
 import TeacherQuizzes from './components/teacher/TeacherQuizzes';
 import TeacherReports from './components/teacher/TeacherReports';
 import OfflineIndicator from './components/OfflineIndicator';
+import P2PConnection from './components/P2PConnection';
 
 function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -36,24 +38,27 @@ function App() {
     <Router>
       <LanguageProvider>
         <AuthProvider>
-          <DataProvider>
-            <div className="min-h-screen bg-gray-50">
-              <OfflineIndicator isOnline={isOnline} />
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/student" element={<StudentDashboard />} />
-                <Route path="/teacher" element={<TeacherDashboard />} />
-                <Route path="/student/lesson/:id" element={<LessonViewer />} />
-                <Route path="/student/quiz/:id" element={<QuizPage />} />
-                <Route path="/student/progress" element={<ProgressPage />} />
-                <Route path="/student/storyteller" element={<AIStoryteller />} />
-                <Route path="/teacher/lessons" element={<TeacherLessons />} />
-                <Route path="/teacher/quizzes" element={<TeacherQuizzes />} />
-                <Route path="/teacher/reports" element={<TeacherReports />} />
-              </Routes>
-            </div>
-          </DataProvider>
+          <P2PProvider>
+            <DataProvider>
+              <div className="min-h-screen bg-gray-50">
+                <OfflineIndicator isOnline={isOnline} />
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/student" element={<StudentDashboard />} />
+                  <Route path="/teacher" element={<TeacherDashboard />} />
+                  <Route path="/student/lesson/:id" element={<LessonViewer />} />
+                  <Route path="/student/quiz/:id" element={<QuizPage />} />
+                  <Route path="/student/progress" element={<ProgressPage />} />
+                  <Route path="/student/storyteller" element={<AIStoryteller />} />
+                  <Route path="/teacher/lessons" element={<TeacherLessons />} />
+                  <Route path="/teacher/quizzes" element={<TeacherQuizzes />} />
+                  <Route path="/teacher/reports" element={<TeacherReports />} />
+                </Routes>
+                <P2PConnection />
+              </div>
+            </DataProvider>
+          </P2PProvider>
         </AuthProvider>
       </LanguageProvider>
     </Router>
